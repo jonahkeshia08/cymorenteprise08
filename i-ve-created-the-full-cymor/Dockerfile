@@ -1,4 +1,3 @@
-Done. I added [Dockerfile](C:\Users\Jonah\Documents\Codex\2026-05-26\i-ve-created-the-full-cymor\Dockerfile) with:
 
 ```dockerfile
 WORKDIR /app/i-ve-created-the-full-cymor
