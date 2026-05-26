@@ -38,7 +38,35 @@ function now() {
   return admin.firestore.FieldValue.serverTimestamp();
 }
 
+/** * WHATSAPP AUTH SESSION LOGIC
+ * Stores the 'creds' in a 'sessions' collection to keep you logged in.
+ */
+async function saveSession(id, data) {
+  try {
+    await db().collection('sessions').doc(id).set({
+      ...data,
+      updatedAt: now()
+    }, { merge: true });
+  } catch (error) {
+    console.error('Error saving session to Firebase:', error);
+  }
+}
+
+async function getSession(id) {
+  try {
+    const doc = await db().collection('sessions').doc(id).get();
+    return doc.exists ? doc.data() : null;
+  } catch (error) {
+    console.error('Error getting session from Firebase:', error);
+    return null;
+  }
+}
+
+/**
+ * STORE PRODUCTS & ORDERS LOGIC
+ */
 async function getProducts({ activeOnly = true } = {}) {
+  // NOTE: Ensure you have a composite index for 'active' and 'name' in Firestore!
   let query = db().collection('products').orderBy('name', 'asc');
   if (activeOnly) query = query.where('active', '==', true);
   const snapshot = await query.get();
@@ -96,6 +124,9 @@ async function findOrderByCheckoutRequestId(checkoutRequestId) {
   return { id: doc.id, ...doc.data() };
 }
 
+/**
+ * BOT STATE PERSISTENCE (Cart, Current Step)
+ */
 async function saveBotSession(phone, state) {
   await db().collection('bot_sessions').doc(phone).set({
     phone,
@@ -114,6 +145,8 @@ module.exports = {
   db,
   now,
   initFirebase,
+  saveSession,
+  getSession,
   getProducts,
   getProduct,
   createCustomer,
