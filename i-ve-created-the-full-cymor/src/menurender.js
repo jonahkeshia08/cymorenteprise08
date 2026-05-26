@@ -1,81 +1,121 @@
 function money(amount) {
-  return `KES ${Number(amount || 0).toLocaleString('en-KE')}`;
+  return `*KES ${Number(amount || 0).toLocaleString('en-KE')}*`;
 }
 
 function homeMenu(storeName = 'Cymor Shoe Store') {
   return [
-    `Welcome to ${storeName}.`,
+    `*👟 WELCOME TO ${storeName.toUpperCase()}*`,
+    '━═━═━═━═━═━═━═━═━',
     '',
-    'Reply with:',
-    '1. View shoes',
-    '2. My cart',
-    '3. Delivery info',
-    '4. Talk to support'
+    'Experience quality footwear delivered to your doorstep. How can we help you today?',
+    '',
+    '*1.* 🛍️ View Catalog',
+    '*2.* 🛒 My Shopping Cart',
+    '*3.* 🚚 Delivery Info',
+    '*4.* 💬 Talk to Support',
+    '',
+    '━═━═━═━═━═━═━═━═━',
+    '*Powered by CymorTechServices*'
   ].join('\n');
 }
 
 function productList(products) {
-  if (!products.length) return 'No shoes are available right now. Please check again soon.';
+  if (!products.length) return '❌ No shoes are available right now. Please check again soon.';
 
   const lines = products.map((product, index) => {
-    const sizes = Array.isArray(product.sizes) && product.sizes.length ? ` | Sizes: ${product.sizes.join(', ')}` : '';
-    return `${index + 1}. ${product.name} - ${money(product.price)}${sizes}`;
+    const sizes = Array.isArray(product.sizes) && product.sizes.length 
+      ? `\n   📏 *Sizes:* ${product.sizes.join(', ')}` 
+      : '';
+    return `*${index + 1}.* 👟 *${product.name}*\n   💰 *Price:* ${money(product.price)}${sizes}\n`;
   });
 
   return [
-    'Available shoes:',
-    ...lines,
+    '*🔥 AVAILABLE COLLECTIONS*',
+    '━═━═━═━═━═━═━═━═━',
     '',
-    'Reply with the product number to add it to cart.',
-    'Reply 0 to go back.'
+    ...lines,
+    '━━━━━━━━━━━━━━━━━━',
+    '💡 *Reply with the product number to add to cart.*',
+    '💡 *Reply 0 to go back.*',
+    '',
+    '*Powered by CymorTechServices*'
   ].join('\n');
 }
 
 function cartSummary(cart) {
   if (!cart || !cart.length) {
-    return 'Your cart is empty. Reply 1 to view shoes.';
+    return 'Your cart is empty. 🛒\nReply *1* to view our amazing collection!';
   }
 
   const lines = cart.map((item, index) => {
-    return `${index + 1}. ${item.name} x${item.quantity} - ${money(item.price * item.quantity)}`;
+    return `*${index + 1}.* ${item.name} (x${item.quantity}) — ${money(item.price * item.quantity)}`;
   });
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   return [
-    'Your cart:',
+    '*🛒 YOUR SHOPPING CART*',
+    '━═━═━═━═━═━═━═━═━',
+    '',
     ...lines,
     '',
-    `Total: ${money(total)}`,
+    '━━━━━━━━━━━━━━━━━━',
+    `*TOTAL PAYABLE: ${money(total)}*`,
+    '━━━━━━━━━━━━━━━━━━',
     '',
-    'Reply:',
-    '1. Checkout with M-Pesa',
-    '2. Clear cart',
-    '0. Back'
+    '📌 *Reply:*',
+    '*1.* 💳 Checkout via M-Pesa',
+    '*2.* 🗑️ Clear Cart',
+    '*0.* 🔙 Back to Menu',
+    '',
+    '*Powered by CymorTechServices*'
   ].join('\n');
 }
 
 function askDelivery() {
   return [
-    'Send your delivery details in this format:',
+    '*🚚 DELIVERY DETAILS*',
+    '━═━═━═━═━═━═━═━═━',
     '',
-    'Name, Town/Estate, Exact location',
+    'Please send your details in this format:',
     '',
-    'Example:',
-    'Amina, Nairobi CBD, Kimathi Street near Jamia Mall'
+    '_Name, Town/Estate, Exact Location_',
+    '',
+    '*Example:*',
+    '_John Doe, Kisumu CBD, Oginga Street near Equity_',
+    '',
+    '━═━═━═━═━═━═━═━═━',
+    '*Powered by CymorTechServices*'
   ].join('\n');
 }
 
 function orderCreated(order) {
   return [
-    `Order ${order.id} created.`,
-    `Amount: ${money(order.total)}`,
+    '✅ *ORDER RECEIVED!*',
+    '━═━═━═━═━═━═━═━═━',
     '',
-    'An M-Pesa prompt will be sent to your phone. Enter your PIN to complete payment.'
+    `*Order ID:* #${order.id.slice(-6).toUpperCase()}`,
+    `*Amount:* ${money(order.total)}`,
+    '',
+    '📱 *M-PESA:* A payment prompt has been sent to your phone. Please enter your PIN to confirm.',
+    '',
+    '━═━═━═━═━═━═━═━═━',
+    '*Powered by CymorTechServices*'
   ].join('\n');
 }
 
 function support(storePhone) {
-  return `A Cymor support agent will help you shortly. You can also call or WhatsApp ${storePhone}.`;
+  return [
+    '*👨‍💻 CYMOR SUPPORT*',
+    '━═━═━═━═━═━═━═━═━',
+    '',
+    'An agent has been notified and will be with you shortly.',
+    '',
+    `📞 *Direct Line:* ${storePhone}`,
+    '📧 *Email:* support@cymortech.com',
+    '',
+    '━═━═━═━═━═━═━═━═━',
+    '*Powered by CymorTechServices*'
+  ].join('\n');
 }
 
 module.exports = {
