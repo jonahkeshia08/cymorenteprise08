@@ -8,6 +8,7 @@
     "dev": "nodemon src/server.js",
     "lint": "eslint .",
     "check": "node --check src/server.js && node --check src/botlogic.js && node --check src/menurender.js && node --check src/firebase.js && node --check src/daraja.js"
+    "postinstall": "puppeteer install"
   },
   "keywords": [
     "cymor",
