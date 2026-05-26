@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cymor WhatsApp Pairing</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <main class="shell">
+    <section class="panel">
+      <div>
+        <p class="eyebrow">Cymor Tech Services</p>
+        <h1>WhatsApp Pairing</h1>
+        <p class="muted">Enter the admin key, fetch the QR code, then scan it from WhatsApp Linked Devices.</p>
+      </div>
+
+      <label class="field">
+        <span>Admin API key</span>
+        <input id="adminKey" type="password" placeholder="ADMIN_API_KEY">
+      </label>
+
+      <div class="actions">
+        <button id="loadBtn">Load QR</button>
+        <a href="/admin.html">Open admin</a>
+      </div>
+
+      <div id="status" class="status">Waiting for admin key.</div>
+      <div class="qrBox">
+        <img id="qr" alt="WhatsApp pairing QR code">
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const keyInput = document.querySelector('#adminKey');
+    const statusBox = document.querySelector('#status');
+    const qr = document.querySelector('#qr');
+
+    async function loadQr() {
+      const key = keyInput.value.trim();
+      if (!key) {
+        statusBox.textContent = 'Enter your admin key first.';
+        return;
+      }
+
+      statusBox.textContent = 'Checking bot status...';
+      const statusRes = await fetch(`/api/pair/status?key=${encodeURIComponent(key)}`);
+      const status = await statusRes.json();
+      statusBox.textContent = `${status.state || 'unknown'}: ${status.message || ''}`;
+
+      if (!status.hasQr) {
+        qr.removeAttribute('src');
+        return;
+      }
+
+      const qrRes = await fetch(`/api/pair/qr?key=${encodeURIComponent(key)}`);
+      const data = await qrRes.json();
+      if (data.qr) qr.src = data.qr;
+    }
+
+    document.querySelector('#loadBtn').addEventListener('click', loadQr);
+    setInterval(() => {
+      if (keyInput.value.trim()) loadQr().catch(() => {});
+    }, 10000);
+  </script>
+</body>
+</html>

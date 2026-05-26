@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cymor Admin</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <main class="admin">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Cymor Shoe Store</p>
+        <h1>Admin Dashboard</h1>
+      </div>
+      <a href="/pair.html">Pair WhatsApp</a>
+    </header>
+
+    <section class="grid">
+      <form id="productForm" class="panel">
+        <h2>Add Shoe</h2>
+        <label class="field"><span>Name</span><input name="name" required></label>
+        <label class="field"><span>Price</span><input name="price" type="number" min="1" required></label>
+        <label class="field"><span>Sizes</span><input name="sizes" placeholder="38, 39, 40, 41"></label>
+        <label class="field"><span>Stock</span><input name="stock" type="number" min="0" value="1"></label>
+        <label class="field"><span>Image URL</span><input name="imageUrl" type="url"></label>
+        <label class="field"><span>Admin key</span><input name="key" type="password" required></label>
+        <button>Add product</button>
+        <p id="formStatus" class="muted"></p>
+      </form>
+
+      <section class="panel">
+        <div class="sectionHead">
+          <h2>Recent Orders</h2>
+          <button id="loadOrders" type="button">Refresh</button>
+        </div>
+        <label class="field"><span>Admin key</span><input id="ordersKey" type="password"></label>
+        <div id="orders" class="list"></div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const form = document.querySelector('#productForm');
+    const formStatus = document.querySelector('#formStatus');
+    const orders = document.querySelector('#orders');
+    const money = (value) => `KES ${Number(value || 0).toLocaleString('en-KE')}`;
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const data = Object.fromEntries(new FormData(form).entries());
+      const key = data.key;
+      delete data.key;
+      data.price = Number(data.price);
+      data.stock = Number(data.stock);
+      data.sizes = data.sizes.split(',').map((size) => size.trim()).filter(Boolean);
+
+      const res = await fetch('/api/products', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', 'x-admin-key': key },
+        body: JSON.stringify(data)
+      });
+
+      formStatus.textContent = res.ok ? 'Product added.' : 'Could not add product.';
+      if (res.ok) form.reset();
+    });
+
+    async function loadOrders() {
+      const key = document.querySelector('#ordersKey').value.trim();
+      orders.textContent = 'Loading...';
+      const res = await fetch('/api/orders', { headers: { 'x-admin-key': key } });
+      const data = await res.json();
+
+      if (!res.ok) {
+        orders.textContent = data.error || 'Could not load orders.';
+        return;
+      }
+
+      orders.innerHTML = data.orders.map((order) => `
+        <article class="row">
+          <strong>${order.id}</strong>
+          <span>${order.customerPhone || ''}</span>
+          <span>${money(order.total)}</span>
+          <span class="pill">${order.status || 'new'}</span>
+        </article>
+      `).join('') || '<p class="muted">No orders yet.</p>';
+    }
+
+    document.querySelector('#loadOrders').addEventListener('click', loadOrders);
+  </script>
+</body>
+</html>
